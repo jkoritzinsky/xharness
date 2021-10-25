@@ -21,10 +21,10 @@ namespace Microsoft.DotNet.XHarness.iOS.Shared.Logging
             Directory = directory ?? throw new ArgumentNullException(nameof(directory));
         }
 
-        public IFileBackedLog Create(string filename, string name, bool? timestamp = null)
+        public IFileBackedLog Create(string filename, string description, bool? timestamp = null)
         {
             System.IO.Directory.CreateDirectory(Directory);
-            var rv = new LogFile(name, Path.GetFullPath(Path.Combine(Directory, filename)));
+            var rv = new LogFile(description, Path.GetFullPath(Path.Combine(Directory, filename)));
             if (timestamp.HasValue)
             {
                 rv.Timestamp = timestamp.Value;
@@ -34,15 +34,9 @@ namespace Microsoft.DotNet.XHarness.iOS.Shared.Logging
             return rv;
         }
 
-        // Adds an existing file to this collection of logs.
-        // If the file is not inside the log directory, then it's copied there.
-        // 'path' must be a full path to the file.
         public IFileBackedLog AddFile(string path) => AddFile(path, Path.GetFileName(path));
 
-        // Adds an existing file to this collection of logs.
-        // If the file is not inside the log directory, then it's copied there.
-        // 'path' must be a full path to the file.
-        public IFileBackedLog AddFile(string path, string name)
+        public IFileBackedLog AddFile(string path, string description)
         {
             if (path == null)
             {
@@ -56,12 +50,11 @@ namespace Microsoft.DotNet.XHarness.iOS.Shared.Logging
                 path = newPath;
             }
 
-            var log = new LogFile(name, path, true);
+            var log = new LogFile(description, path, true);
             Add(log);
             return log;
         }
 
-        // Create an empty file in the log directory and return the full path to the file
         public string CreateFile(string path, string description)
         {
             if (path == null)
