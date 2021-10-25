@@ -68,9 +68,6 @@ namespace Microsoft.DotNet.XHarness.Apple.Tests
             Directory.CreateDirectory(s_outputPath);
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
         public async Task TestOnSimulatorTest(bool useTunnel)
         {
             var testResultFilePath = Path.GetTempFileName();
