@@ -37,6 +37,9 @@ namespace Microsoft.DotNet.XHarness.Apple
         private readonly ILogs _logs;
         private readonly IHelpers _helpers;
 
+        private string? _tempPath = null;
+        private string? _tempErrPath = null;
+
         public AppTester(
             IMlaunchProcessManager processManager,
             ISimpleListenerFactory simpleListenerFactory,
@@ -200,6 +203,9 @@ namespace Microsoft.DotNet.XHarness.Apple
                         companionDevice as ISimulatorDevice,
                         timeout,
                         cancellationToken);
+
+                    _logs.AddFile(_tempPath, LogType.ApplicationLog.ToString());
+                    _logs.AddFile(_tempErrPath, LogType.ApplicationLog.ToString());
                 }
                 else
                 {
@@ -553,9 +559,10 @@ namespace Microsoft.DotNet.XHarness.Apple
             args.Add(new SetEnvVariableArgument(EnviromentVariables.HostName, "127.0.0.1"));
             args.Add(new SimulatorUDIDArgument(simulator));
 
-            var appLog = _logs.CreateFile(appInformation.BundleIdentifier + ".log", LogType.ApplicationLog);
-            args.Add(new SetStdoutArgument(appLog));
-            args.Add(new SetStderrArgument(appLog)); // Seems like mlaunch only redirects stderr, stdout doesn't produce any data, however stderr captures stdout of the app too
+            _tempPath = Path.GetTempFileName();
+            _tempErrPath = Path.GetTempFileName();
+            args.Add(new SetStdoutArgument(_tempPath));
+            args.Add(new SetStderrArgument(_tempErrPath)); // Seems like mlaunch only redirects stderr, stdout doesn't produce any data, however stderr captures stdout of the app too
 
             if (appInformation.Extension.HasValue)
             {
